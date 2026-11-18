@@ -10,14 +10,12 @@ const auth = useAuthStore()
 const router = useRouter()
 const mobileMenuRef = ref(null)
 
-const accountButtonText = computed(() =>
-  auth.user ? 'Till medlemsportalen' : 'Medlemsinloggning',
-)
+const accountButtonText = computed(() => (auth.user ? 'Till medlemsportalen' : 'Medlemsinloggning'))
 
 const mobileMenu = computed(() => [
   { label: 'Hem', command: () => router.push('/') },
-  { label: 'Om klubben', command: () => router.push('/about') },
   { label: 'Aktiviteter', url: '/#aktiviteter' },
+  { label: 'Om klubben', command: () => router.push('/about') },
   { label: accountButtonText.value, command: goToAccount },
   { label: 'Logga ut', command: logout },
 ])
@@ -45,8 +43,8 @@ async function logout() {
 
       <nav class="nav-links">
         <RouterLink to="/">Hem</RouterLink>
-        <RouterLink to="/about">Om klubben</RouterLink>
         <a href="/#aktiviteter">Aktiviteter</a>
+        <RouterLink to="/about">Om klubben</RouterLink>
       </nav>
       <button class="login-button" @click="goToAccount">
         {{ accountButtonText }}
