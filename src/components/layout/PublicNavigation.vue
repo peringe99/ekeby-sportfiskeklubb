@@ -1,16 +1,26 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowRight, LogOut } from 'lucide-vue-next'
+import { ArrowRight, LogOut, Menu as MenuIcon } from 'lucide-vue-next'
+import Menu from 'primevue/menu'
 import { useAuthStore } from '@/stores/auth'
 import logo from '@/assets/images/ekeby_logo.png'
 
 const auth = useAuthStore()
 const router = useRouter()
+const mobileMenuRef = ref(null)
 
 const accountButtonText = computed(() =>
   auth.user ? 'Till medlemsportalen' : 'Medlemsinloggning',
 )
+
+const mobileMenu = computed(() => [
+  { label: 'Hem', command: () => router.push('/') },
+  { label: 'Om klubben', command: () => router.push('/about') },
+  { label: 'Aktiviteter', url: '/#aktiviteter' },
+  { label: accountButtonText.value, command: goToAccount },
+  { label: 'Logga ut', command: logout },
+])
 
 function goToAccount() {
   router.push(auth.user ? '/members' : '/login')
@@ -46,6 +56,15 @@ async function logout() {
         <LogOut :size="16" />
         Logga ut
       </button>
+      <button
+        class="mobile-menu-button"
+        type="button"
+        aria-label="Öppna meny"
+        @click="mobileMenuRef?.toggle($event)"
+      >
+        <MenuIcon :size="20" />
+      </button>
+      <Menu ref="mobileMenuRef" :model="mobileMenu" popup />
     </div>
   </header>
 </template>
@@ -153,22 +172,36 @@ async function logout() {
   border-color: #e8cccc;
 }
 
+.mobile-menu-button {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #dfe8df;
+  border-radius: 8px;
+  background: white;
+  color: #365b45;
+  cursor: pointer;
+}
+
 @media (max-width: 750px) {
   .nav-inner {
     padding: 0 20px;
   }
 
-  .nav-links {
+  .nav-links,
+  .login-button,
+  .logout-button {
     display: none;
+  }
+
+  .mobile-menu-button {
+    display: flex;
   }
 }
 
 @media (max-width: 420px) {
-  .login-button {
-    padding: 10px;
-    font-size: 10px;
-  }
-
   .brand small {
     font-size: 8px;
   }

@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 
 import { House, Fish, CalendarDays, Newspaper, Users, LogOut } from 'lucide-vue-next'
+import PublicNavigation from '@/components/layout/PublicNavigation.vue'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -25,6 +26,7 @@ const navigation = [
 </script>
 
 <template>
+  <PublicNavigation />
   <div class="member-layout">
     <aside class="sidebar">
       <div class="brand">
