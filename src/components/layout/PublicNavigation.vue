@@ -1,0 +1,176 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { ArrowRight, LogOut } from 'lucide-vue-next'
+import { useAuthStore } from '@/stores/auth'
+import logo from '@/assets/images/ekeby_logo.png'
+
+const auth = useAuthStore()
+const router = useRouter()
+
+const accountButtonText = computed(() =>
+  auth.user ? 'Till medlemsportalen' : 'Medlemsinloggning',
+)
+
+function goToAccount() {
+  router.push(auth.user ? '/members' : '/login')
+}
+
+async function logout() {
+  await auth.logout()
+  router.push('/login')
+}
+</script>
+
+<template>
+  <header class="navbar">
+    <div class="nav-inner">
+      <RouterLink to="/" class="brand">
+        <img :src="logo" alt="Ekeby Sportfiskeklubb" class="brand-logo" />
+        <span>
+          <strong>Ekeby</strong>
+          <small>SPORTFISKEKLUBB</small>
+        </span>
+      </RouterLink>
+
+      <nav class="nav-links">
+        <RouterLink to="/">Hem</RouterLink>
+        <RouterLink to="/about">Om klubben</RouterLink>
+        <a href="/#aktiviteter">Aktiviteter</a>
+      </nav>
+      <button class="login-button" @click="goToAccount">
+        {{ accountButtonText }}
+        <ArrowRight :size="16" />
+      </button>
+      <button class="logout-button" @click="logout">
+        <LogOut :size="16" />
+        Logga ut
+      </button>
+    </div>
+  </header>
+</template>
+
+<style scoped>
+.navbar {
+  height: 82px;
+  background: #fff;
+  border-bottom: 1px solid #edf0ec;
+}
+
+.nav-inner {
+  max-width: 1240px;
+  height: 100%;
+  margin: auto;
+  padding: 0 35px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: #254a34;
+  text-decoration: none;
+}
+
+.brand strong,
+.brand small {
+  display: block;
+}
+
+.brand strong {
+  font-size: 17px;
+  letter-spacing: -0.4px;
+}
+
+.brand small {
+  color: #849287;
+  font-size: 9px;
+  letter-spacing: 1.6px;
+  margin-top: 3px;
+}
+
+.brand-logo {
+  margin-top: 25px;
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+
+.nav-links a {
+  color: #69766d;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 550;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover,
+.nav-links a.router-link-active {
+  color: #315e40;
+}
+
+.login-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 17px;
+  border: 1px solid #dfe8df;
+  border-radius: 8px;
+  background: white;
+  color: #365b45;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.logout-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  border: 1px solid #e9eee9;
+  border-radius: 8px;
+  background: white;
+  color: #647368;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.logout-button:hover {
+  background: #f7f9f7;
+  color: #b54747;
+  border-color: #e8cccc;
+}
+
+@media (max-width: 750px) {
+  .nav-inner {
+    padding: 0 20px;
+  }
+
+  .nav-links {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .login-button {
+    padding: 10px;
+    font-size: 10px;
+  }
+
+  .brand small {
+    font-size: 8px;
+  }
+}
+</style>

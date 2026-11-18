@@ -1,0 +1,134 @@
+:root {
+  font-family: Inter, system-ui, sans-serif;
+  color: #1f2933;
+  background: #f7f8f6;
+
+  --color-primary: #245c46;
+  --color-primary-hover: #194633;
+  --color-background: #f7f8f6;
+  --color-surface: #ffffff;
+  --color-border: #e5e9e5;
+  --color-text: #1f2933;
+  --color-muted: #718078;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--color-background);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.member-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  flex-shrink: 0;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px 32px;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--color-primary);
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  color: var(--color-muted);
+  text-decoration: none;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  background: #edf3ef;
+  color: var(--color-primary);
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px 12px 0;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-wrap: anywhere;
+}
+
+.sidebar-footer button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  background: none;
+  padding: 8px 0;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.topbar {
+  height: 68px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+}
+
+.page-content {
+  padding: 32px;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 76px;
+    padding: 16px 8px;
+  }
+
+  .brand span,
+  .nav-item:not(.active) {
+    /* Replace with proper responsive navigation later. */
+  }
+
+  .page-content {
+    padding: 20px;
+  }
+}
