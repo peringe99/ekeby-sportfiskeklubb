@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { ChevronDown, Fish, MapPin, Scale, RefreshCw } from 'lucide-vue-next'
+import {
+  CalendarDays,
+  ChevronDown,
+  Fish,
+  MapPin,
+  RefreshCw,
+  Scale,
+  UserRound,
+} from 'lucide-vue-next'
+import DatePicker from 'primevue/datepicker'
 import { useAuthStore } from '@/stores/auth'
 import { supabase } from '@/utils/supabase'
 import PublicNavigation from '@/components/layout/PublicNavigation.vue'
@@ -12,6 +21,8 @@ interface FishingReport {
   location: string
   description: string
   image_path: string | null
+  full_name: string | null
+  created_at: string
 }
 
 const imageBucket = 'fishing-report-images'
@@ -28,6 +39,7 @@ const route = useRoute()
 const reports = ref<FishingReport[]>([])
 const fishType = ref('')
 const weight = ref<number | null>(null)
+const catchDate = ref<Date | null>(null)
 const location = ref('')
 const description = ref('')
 const imageFile = ref<File | null>(null)
@@ -50,7 +62,7 @@ async function fetchReports() {
   try {
     const { data, error } = await supabase
       .from('fishing_reports')
-      .select('fish_type, weight, location, description, image_path')
+      .select('fish_type, weight, location, description, image_path, full_name, created_at')
 
     if (error) throw error
 
@@ -61,6 +73,19 @@ async function fetchReports() {
   } finally {
     loading.value = false
   }
+}
+
+function getLocalDateString(date: Date) {
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60_000).toISOString().slice(0, 10)
+}
+
+function formatReportDate(date: string) {
+  return new Intl.DateTimeFormat('sv-SE', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(date))
 }
 
 function handleImageSelection(event: Event) {
@@ -96,6 +121,8 @@ async function addReport() {
   submitError.value = ''
   successMessage.value = ''
   const reportWeight = weight.value
+  const fullName = auth.profile?.full_name?.trim()
+  const reportDate = getLocalDateString(catchDate.value ?? new Date())
 
   if (!isActiveMember.value || !auth.user) {
     submitError.value = 'Endast aktiva medlemmar kan lägga till fångster.'
@@ -108,9 +135,10 @@ async function addReport() {
     !description.value.trim() ||
     reportWeight === null ||
     !Number.isFinite(reportWeight) ||
-    reportWeight <= 0
+    reportWeight <= 0 ||
+    !fullName
   ) {
-    submitError.value = 'Fyll i alla fält och ange en vikt som är större än noll.'
+    submitError.value = 'Fyll i alla fält, ange ditt namn och ange en vikt som är större än noll.'
     return
   }
 
@@ -141,6 +169,8 @@ async function addReport() {
       location: location.value.trim(),
       description: description.value.trim(),
       image_path: uploadedImagePath,
+      full_name: fullName,
+      created_at: `${reportDate}T12:00:00.000Z`,
     })
 
     if (error) throw error
@@ -148,10 +178,12 @@ async function addReport() {
     uploadedImagePath = null
     fishType.value = ''
     weight.value = null
+    catchDate.value = null
     location.value = ''
     description.value = ''
     clearImageSelection()
     successMessage.value = 'Fångsten har lagts till.'
+    isFormExpanded.value = false
     await fetchReports()
   } catch (error) {
     console.error('Could not add fishing report:', error)
@@ -240,6 +272,21 @@ onMounted(async () => {
               />
             </label>
 
+            <label>
+              Fångstdatum
+              <DatePicker
+                v-model="catchDate"
+                inputId="catch-date"
+                dateFormat="dd/mm/yy"
+                :manualInput="false"
+                showIcon
+                showButtonBar
+                panelClass="catch-date-picker-panel"
+                class="date-picker"
+              />
+              <small>Lämna tomt för dagens datum.</small>
+            </label>
+
             <label class="full-width">
               Plats
               <input
@@ -283,14 +330,14 @@ onMounted(async () => {
           <p v-if="submitError" class="form-message error-message" role="alert">
             {{ submitError }}
           </p>
-          <p v-if="successMessage" class="form-message success-message" role="status">
-            {{ successMessage }}
-          </p>
 
           <button class="submit-button" type="submit" :disabled="submitting">
             {{ submitting ? 'Sparar...' : 'Publicera fångst' }}
           </button>
         </form>
+        <p v-if="successMessage" class="form-message success-message" role="status">
+          {{ successMessage }}
+        </p>
       </section>
 
       <section class="reports-section">
@@ -338,7 +385,12 @@ onMounted(async () => {
             <div class="report-details">
               <span><Scale :size="16" />{{ report.weight }} kg</span>
               <span><MapPin :size="16" />{{ report.location }}</span>
+              <span><CalendarDays :size="16" />{{ formatReportDate(report.created_at) }}</span>
             </div>
+            <p class="report-author">
+              <UserRound :size="16" />
+              Inrapporterad av {{ report.full_name || 'Okänd medlem' }}
+            </p>
             <p class="report-description">{{ report.description }}</p>
           </article>
         </div>
@@ -497,6 +549,24 @@ onMounted(async () => {
   font-weight: 400;
 }
 
+.date-picker {
+  width: 100%;
+}
+
+.date-picker :deep(.p-inputtext) {
+  width: 100%;
+  padding: 11px 12px;
+  color: #25332b;
+  background: #fff;
+  border-color: #dfe7df;
+  border-radius: 8px;
+}
+
+:global(.catch-date-picker-panel) {
+  color: #25332b;
+  background: #fff;
+}
+
 .form-grid input[type='file'] {
   padding: 9px;
 }
@@ -629,6 +699,15 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+.report-author {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: -4px 0 14px;
+  color: #718078;
+  font-size: 0.82rem;
 }
 
 .report-description {
