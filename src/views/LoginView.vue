@@ -15,6 +15,24 @@ const password = ref('')
 const errorMessage = ref('')
 const isSubmitting = ref(false)
 
+function getLoginErrorMessage(message: string) {
+  const normalizedMessage = message?.toLowerCase() ?? ''
+
+  if (normalizedMessage.includes('invalid login credentials')) {
+    return 'E-postadressen eller lösenordet är felaktigt.'
+  }
+
+  if (normalizedMessage.includes('email not confirmed')) {
+    return 'Du behöver bekräfta din e-postadress innan du kan logga in.'
+  }
+
+  if (normalizedMessage.includes('too many requests')) {
+    return 'För många inloggningsförsök. Försök igen senare.'
+  }
+
+  return 'Det gick inte att logga in. Kontrollera dina uppgifter och försök igen.'
+}
+
 async function handleLogin() {
   if (isSubmitting.value) return
 
@@ -25,13 +43,14 @@ async function handleLogin() {
     const { error } = await auth.login(email.value, password.value)
 
     if (error) {
-      errorMessage.value = error.message
+      errorMessage.value = getLoginErrorMessage(error.message)
       return
     }
 
     await router.push('/members')
-  } catch {
-    errorMessage.value = 'Something went wrong. Please try again.'
+  } catch (error) {
+    console.error('Failed to log in:', error)
+    errorMessage.value = 'Ett oväntat fel uppstod. Försök igen.'
   } finally {
     isSubmitting.value = false
   }
@@ -50,17 +69,16 @@ async function handleLogin() {
 
           <div class="welcome-text">
             <span class="eyebrow">EKEBY SPORTFISKEKLUBB</span>
-            <h1>Welcome back.</h1>
+            <h1>Välkommen tillbaka.</h1>
             <p>
-              Your place for club news, fishing reports and everything happening within the
-              community.
+              Här hittar du klubbens nyheter, fångstrapporter och allt som händer i vår gemenskap.
             </p>
           </div>
         </div>
 
         <div class="panel-footer">
-          <span>Est. 1949</span>
-          <span>Ekeby, Sweden</span>
+          <span>Grundad 1949</span>
+          <span>Ekeby, Sverige</span>
         </div>
       </section>
 
@@ -68,19 +86,19 @@ async function handleLogin() {
       <section class="form-panel">
         <div class="form-content">
           <div class="form-heading">
-            <span class="eyebrow">MEMBER AREA</span>
-            <h2>Sign in</h2>
-            <p>Enter your credentials to access the member portal.</p>
+            <span class="eyebrow">FÖR MEDLEMMAR</span>
+            <h2>Logga in</h2>
+            <p>Ange dina inloggningsuppgifter för att komma åt medlemssidorna.</p>
           </div>
 
           <form @submit.prevent="handleLogin">
             <div class="form-field">
-              <label for="email">Email address</label>
+              <label for="email">E-postadress</label>
               <InputText
                 id="email"
                 v-model="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="namn@exempel.se"
                 autocomplete="username"
                 required
                 class="login-input"
@@ -88,11 +106,11 @@ async function handleLogin() {
             </div>
 
             <div class="form-field">
-              <label for="password">Password</label>
+              <label for="password">Lösenord</label>
               <Password
                 v-model="password"
                 inputId="password"
-                placeholder="Enter your password"
+                placeholder="Ange ditt lösenord"
                 autocomplete="current-password"
                 :feedback="false"
                 toggleMask
@@ -108,7 +126,7 @@ async function handleLogin() {
 
             <Button
               type="submit"
-              label="Sign in"
+              label="Logga in"
               :loading="isSubmitting"
               :disabled="!email || !password || isSubmitting"
               class="login-button"
@@ -116,8 +134,11 @@ async function handleLogin() {
           </form>
 
           <div class="form-footer">
-            <span>Having trouble signing in?</span>
-            <p>Contact a club administrator for assistance.</p>
+            <span>Problem med att logga in?</span>
+            <p>
+              <a href="mailto:tupelo@telia.com">Kontakta en administratör i klubben</a> om du
+              behöver hjälp.
+            </p>
           </div>
         </div>
       </section>
@@ -408,6 +429,11 @@ async function handleLogin() {
   color: #929b93;
   font-size: 12px;
   line-height: 1.5;
+}
+
+.form-footer a {
+  color: #536456;
+  text-underline-offset: 2px;
 }
 
 /* Responsive */
