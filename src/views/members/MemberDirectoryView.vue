@@ -6,6 +6,7 @@ import { supabase } from '@/utils/supabase'
 interface Member {
   full_name: string | null
   email: string
+  role: string
 }
 
 const members = ref<Member[]>([])
@@ -17,7 +18,7 @@ async function fetchMembers() {
   errorMessage.value = ''
 
   try {
-    const { data, error } = await supabase.rpc('get_active_member_directory')
+    const { data, error } = await supabase.rpc('get_active_member_directory_with_role')
 
     if (error) throw error
 
@@ -71,7 +72,10 @@ onMounted(fetchMembers)
           <Users :size="20" />
         </div>
         <div class="member-info">
-          <h2>{{ member.full_name || 'Namn saknas' }}</h2>
+          <div class="member-title">
+            <h2>{{ member.full_name || 'Namn saknas' }}</h2>
+            <span v-if="member.role === 'admin'" class="admin-pill">Administratör</span>
+          </div>
           <a :href="`mailto:${member.email}`">
             <Mail :size="15" />
             {{ member.email }}
@@ -182,9 +186,30 @@ onMounted(fetchMembers)
   min-width: 0;
 }
 
+.member-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+}
+
 .member-info h2 {
-  margin: 0 0 7px;
+  margin: 0;
   font-size: 1rem;
+}
+
+.admin-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border: 1px solid #f3dfb2;
+  border-radius: 999px;
+  color: #805713;
+  background: #fff3d6;
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .member-info a {
