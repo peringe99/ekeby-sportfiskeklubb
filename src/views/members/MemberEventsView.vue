@@ -4,6 +4,7 @@ import { CalendarDays, MapPin, RefreshCw } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { supabase } from '@/utils/supabase'
 import CreateEvent from './CreateEvent.vue'
+import EventComments from './EventComments.vue'
 
 interface ClubEvent {
   id: string
@@ -131,6 +132,7 @@ onMounted(fetchEvents)
           <MapPin :size="16" />
           {{ event.location }}
         </div>
+        <EventComments :event-id="event.id" />
       </article>
     </section>
   </main>
