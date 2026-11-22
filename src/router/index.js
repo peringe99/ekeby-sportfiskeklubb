@@ -29,6 +29,11 @@ const router = createRouter({
       component: () => import('@/views/members/NewsView.vue'),
     },
     {
+      path: '/fangster',
+      name: 'FishingReports',
+      component: () => import('@/views/members/FishingReportsView.vue'),
+    },
+    {
       path: '/members',
       component: () => import('@/layouts/MemberLayout.vue'),
       meta: { requiresAuth: true },

@@ -20,7 +20,7 @@ const auth = useAuthStore()
 const isLoggedIn = computed(() => !!auth.user)
 
 const accountButtonText = computed(() =>
-  isLoggedIn.value ? 'Till medlemsportalen' : 'Medlemsinloggning',
+  isLoggedIn.value ? 'Min sida' : 'Logga in',
 )
 
 function goToAccount() {
@@ -154,7 +154,7 @@ function goToAccount() {
       <div class="cta-content">
         <div class="intro-label">
           <span></span>
-          MEDLEMSPORTALEN
+          FÖR MEDLEMMAR
         </div>
 
         <h2>Allt för klubbens medlemmar.</h2>
@@ -162,7 +162,7 @@ function goToAccount() {
         <p>Logga in för att ta del av klubbnyheter, aktiviteter, dokument och information.</p>
 
         <button class="primary-button" @click="goToLogin">
-          Gå till medlemsportalen
+          Logga in
           <ArrowRight :size="17" />
         </button>
       </div>

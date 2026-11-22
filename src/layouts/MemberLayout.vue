@@ -11,7 +11,6 @@ const auth = useAuthStore()
   <div class="member-layout">
     <main class="main-content">
       <header class="topbar">
-        <span>Member portal</span>
         <span>{{ auth.profile?.full_name }}</span>
       </header>
 

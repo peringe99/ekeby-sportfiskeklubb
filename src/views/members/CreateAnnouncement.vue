@@ -167,11 +167,14 @@ async function publishAnnouncement() {
 .create-announcement {
   display: flex;
   justify-content: flex-end;
+  width: 100%;
+  min-width: 0;
 }
 
 .create-button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 9px;
   padding: 11px 18px;
   background: #285b43;
@@ -179,10 +182,29 @@ async function publishAnnouncement() {
   border-radius: 9px;
   color: white;
   font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .create-button:hover {
   background: #183d2c;
+  transform: translateY(-1px);
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .create-announcement {
+    justify-content: stretch;
+    margin-top: 18px;
+  }
+
+  .create-button {
+    width: 100%;
+    min-height: 46px;
+    padding: 12px 16px;
+  }
 }
 
 .announcement-form {
@@ -243,6 +265,7 @@ async function publishAnnouncement() {
   padding: 18px;
   background: #f8faf8;
   border-radius: 10px;
+  color: black;
 }
 
 .option {
@@ -271,5 +294,43 @@ async function publishAnnouncement() {
   margin: 0;
   color: #c0392b;
   font-size: 0.9rem;
+}
+
+@media (max-width: 600px) {
+  .announcement-form {
+    gap: 20px;
+  }
+
+  .form-intro {
+    align-items: flex-start;
+  }
+
+  .form-intro h3 {
+    font-size: 0.95rem;
+  }
+
+  .form-intro p {
+    line-height: 1.5;
+  }
+
+  .options {
+    padding: 15px;
+    gap: 20px;
+  }
+
+  .option {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .announcement-form {
+    padding-bottom: 8px;
+  }
+  .news-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
 }
 </style>
