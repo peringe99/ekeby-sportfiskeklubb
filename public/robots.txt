@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /members
+Disallow: /login
+Disallow: /accept-invitation
+Sitemap: https://ekebysportfiskeklubb.se/sitemap.xml
