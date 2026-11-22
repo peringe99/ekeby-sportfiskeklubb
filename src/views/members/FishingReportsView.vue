@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { Fish, MapPin, Scale, RefreshCw } from 'lucide-vue-next'
+import { ChevronDown, Fish, MapPin, Scale, RefreshCw } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { supabase } from '@/utils/supabase'
 import PublicNavigation from '@/components/layout/PublicNavigation.vue'
@@ -33,6 +33,7 @@ const description = ref('')
 const imageFile = ref<File | null>(null)
 const imagePreview = ref('')
 const imageInput = ref<HTMLInputElement | null>(null)
+const isFormExpanded = ref(false)
 const loading = ref(true)
 const submitting = ref(false)
 const errorMessage = ref('')
@@ -200,8 +201,27 @@ onMounted(async () => {
       </header>
 
       <section v-if="isActiveMember" class="report-form-card">
-        <h2>Lägg till en fångst</h2>
-        <form class="report-form" @submit.prevent="addReport">
+        <h2 class="form-toggle-heading">
+          <button
+            class="form-toggle-button"
+            type="button"
+            aria-controls="report-form"
+            :aria-expanded="isFormExpanded"
+            @click="isFormExpanded = !isFormExpanded"
+          >
+            <span class="form-toggle-text">
+              <span class="form-toggle-title">Lägg till en fångst</span>
+              <small>{{ isFormExpanded ? 'Dölj formuläret' : 'Visa formuläret' }}</small>
+            </span>
+            <ChevronDown :size="20" :class="{ expanded: isFormExpanded }" />
+          </button>
+        </h2>
+        <form
+          id="report-form"
+          v-show="isFormExpanded"
+          class="report-form"
+          @submit.prevent="addReport"
+        >
           <div class="form-grid">
             <label>
               Fiskart
@@ -394,13 +414,52 @@ onMounted(async () => {
 
 .report-form-card {
   padding: 25px;
-  margin-bottom: 40px;
+  margin-bottom: 28px;
 }
 
 .report-form-card h2,
 .section-heading h2 {
   margin: 0;
   font-size: 1.3rem;
+}
+
+.form-toggle-button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.form-toggle-heading {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.form-toggle-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-toggle-button small {
+  color: #718078;
+  font-size: 0.85rem;
+}
+
+.form-toggle-button svg {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.form-toggle-button svg.expanded {
+  transform: rotate(180deg);
 }
 
 .report-form {
