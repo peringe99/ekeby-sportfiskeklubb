@@ -239,7 +239,7 @@ function goToAccount() {
       rgb(20 48 34 / 78%) 48%,
       rgb(20 48 34 / 28%) 100%
     ),
-    url('https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=85')
+    url('https://images.unsplash.com/photo-1663637157615-69759105d1fe?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D')
       center 52% / cover no-repeat;
   transform: scale(1.02);
 }

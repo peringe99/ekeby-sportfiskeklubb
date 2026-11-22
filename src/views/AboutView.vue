@@ -2,7 +2,7 @@
 import PublicNavigation from '@/components/layout/PublicNavigation.vue'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
-import { CalendarDays, MapPin, Users, Wallet, Fish, Home, ArrowRight, Clock } from 'lucide-vue-next'
+import { CalendarDays, MapPin, Users, Wallet, Fish, ArrowRight, Clock } from 'lucide-vue-next'
 </script>
 
 <template>
@@ -37,10 +37,7 @@ import { CalendarDays, MapPin, Users, Wallet, Fish, Home, ArrowRight, Clock } fr
       </div>
 
       <div class="hero-image">
-        <img
-          src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=85"
-          alt="Naturskön sjö omgiven av skog"
-        />
+        <img src="../assets/images/oring.webp" alt="Naturskön sjö omgiven av skog" />
         <div class="image-caption">
           <MapPin :size="16" />
           <span>Fiske och natur i fokus</span>
@@ -61,8 +58,8 @@ import { CalendarDays, MapPin, Users, Wallet, Fish, Home, ArrowRight, Clock } fr
       <div class="fact">
         <Users :size="23" />
         <div>
-          <strong>60+</strong>
-          <span>Medlemmar</span>
+          <strong>Gemenskap</strong>
+          <span>En förening för fiskeintresserade</span>
         </div>
       </div>
 
@@ -75,10 +72,10 @@ import { CalendarDays, MapPin, Users, Wallet, Fish, Home, ArrowRight, Clock } fr
       </div>
 
       <div class="fact">
-        <Home :size="23" />
+        <MapPin :size="23" />
         <div>
           <strong>Ekeby</strong>
-          <span>Vår klubbstuga</span>
+          <span>Vår hemort</span>
         </div>
       </div>
     </section>
@@ -87,7 +84,7 @@ import { CalendarDays, MapPin, Users, Wallet, Fish, Home, ArrowRight, Clock } fr
     <section id="klubben" class="story-section">
       <div class="story-image">
         <img
-          src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=85"
+          src="https://images.unsplash.com/photo-1761197379839-b5759e0146a0?q=80&w=1373&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D"
           alt="Grönskande natur vid vatten"
         />
       </div>
@@ -109,8 +106,8 @@ import { CalendarDays, MapPin, Users, Wallet, Fish, Home, ArrowRight, Clock } fr
         </p>
 
         <p>
-          Med omkring 60 medlemmar fortsätter vi att utveckla klubben och skapa en plats där både
-          nya och erfarna sportfiskare kan mötas.
+          Tillsammans fortsätter vi att utveckla klubben och skapa en plats där både nya och erfarna
+          sportfiskare kan mötas.
         </p>
       </div>
     </section>
@@ -132,30 +129,26 @@ import { CalendarDays, MapPin, Users, Wallet, Fish, Home, ArrowRight, Clock } fr
         </p>
       </div>
 
-      <Card class="clubhouse-card">
+      <Card class="community-card">
         <template #header>
           <img
-            src="https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?auto=format&fit=crop&w=1000&q=85"
-            alt="Mysig stuga i naturen"
+            src="https://plus.unsplash.com/premium_photo-1726848057778-a87a90c6be3b?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D"
+            alt="Sjö och natur i Ekeby"
           />
         </template>
 
         <template #title>
           <div class="card-title">
-            <Home :size="20" />
-            Vår klubbstuga
+            <Users :size="20" />
+            Gemenskap vid vattnet
           </div>
         </template>
 
         <template #content>
           <p>
-            På Bjerrings väg i Ekeby har klubben sin egen samlingsplats. Här finns ett litet kök,
-            soffor och grill – en naturlig plats för medlemmar att träffas och umgås.
+            Klubben samlar fiskeintresserade för att dela erfarenheter, träffas och delta i
+            aktiviteter under året.
           </p>
-          <div class="location-line">
-            <MapPin :size="16" />
-            Bjerrings väg, Ekeby
-          </div>
         </template>
       </Card>
     </section>
@@ -410,24 +403,24 @@ import { CalendarDays, MapPin, Users, Wallet, Fish, Home, ArrowRight, Clock } fr
   padding: 30px;
 }
 
-.clubhouse-card {
+.community-card {
   overflow: hidden;
   border-radius: 14px;
 }
 
-.clubhouse-card :deep(.p-card-body) {
+.community-card :deep(.p-card-body) {
   padding: 24px;
 }
 
-.clubhouse-card :deep(.p-card-title) {
+.community-card :deep(.p-card-title) {
   font-size: 1.2rem;
 }
 
-.clubhouse-card :deep(.p-card-content) {
+.community-card :deep(.p-card-content) {
   padding-top: 0;
 }
 
-.clubhouse-card img {
+.community-card img {
   display: block;
   width: 100%;
   height: 220px;
@@ -444,21 +437,11 @@ import { CalendarDays, MapPin, Users, Wallet, Fish, Home, ArrowRight, Clock } fr
   color: var(--green);
 }
 
-.clubhouse-card p,
+.community-card p,
 .payment-card p,
 .price-card p {
   color: var(--muted);
   line-height: 1.7;
-}
-
-.location-line {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 18px;
-  color: var(--green);
-  font-size: 0.9rem;
-  font-weight: 600;
 }
 
 .membership-section {
