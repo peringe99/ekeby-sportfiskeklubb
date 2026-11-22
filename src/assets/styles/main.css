@@ -28,74 +28,7 @@ input {
 }
 
 .member-layout {
-  display: flex;
-  min-height: 100vh;
-}
-
-.sidebar {
-  width: 250px;
-  flex-shrink: 0;
-  background: var(--color-surface);
-  border-right: 1px solid var(--color-border);
-  padding: 24px 16px;
-  display: flex;
-  flex-direction: column;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 12px 32px;
-  font-weight: 700;
-  font-size: 18px;
-  color: var(--color-primary);
-}
-
-.sidebar nav {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 8px;
-  color: var(--color-muted);
-  text-decoration: none;
-  transition:
-    background 0.2s,
-    color 0.2s;
-}
-
-.nav-item:hover,
-.nav-item.active {
-  background: #edf3ef;
-  color: var(--color-primary);
-}
-
-.sidebar-footer {
-  margin-top: auto;
-  padding: 16px 12px 0;
-  border-top: 1px solid var(--color-border);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow-wrap: anywhere;
-}
-
-.sidebar-footer button {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border: 0;
-  background: none;
-  padding: 8px 0;
-  color: var(--color-muted);
-  cursor: pointer;
+  min-height: calc(100vh - 82px);
 }
 
 .main-content {
@@ -118,16 +51,6 @@ input {
 }
 
 @media (max-width: 768px) {
-  .sidebar {
-    width: 76px;
-    padding: 16px 8px;
-  }
-
-  .brand span,
-  .nav-item:not(.active) {
-    /* Replace with proper responsive navigation later. */
-  }
-
   .page-content {
     padding: 20px;
   }

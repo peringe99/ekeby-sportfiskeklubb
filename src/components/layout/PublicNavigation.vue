@@ -43,7 +43,7 @@ async function logout() {
 
       <nav class="nav-links">
         <RouterLink to="/">Hem</RouterLink>
-        <a href="/#aktiviteter">Aktiviteter</a>
+        <RouterLink to="/news">Aktiviteter</RouterLink>
         <RouterLink to="/about">Om klubben</RouterLink>
       </nav>
       <button class="login-button" @click="goToAccount">
@@ -87,6 +87,7 @@ async function logout() {
 .brand {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 11px;
   color: #254a34;
   text-decoration: none;
@@ -110,9 +111,8 @@ async function logout() {
 }
 
 .brand-logo {
-  margin-top: 25px;
-  width: 75px;
-  height: 75px;
+  width: 50px;
+  height: 50px;
   object-fit: contain;
 }
 
@@ -128,11 +128,13 @@ async function logout() {
   font-size: 13px;
   font-weight: 550;
   transition: color 0.2s;
+  border: 2px solid transparent;
 }
 
 .nav-links a:hover,
 .nav-links a.router-link-active {
   color: #315e40;
+  border-bottom: 2px solid #315e40;
 }
 
 .login-button {

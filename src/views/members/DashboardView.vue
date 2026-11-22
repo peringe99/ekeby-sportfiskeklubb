@@ -156,7 +156,7 @@ onMounted(fetchAnnouncements)
             <h2>Senaste nytt</h2>
           </div>
 
-          <button class="text-link" @click="goTo('/members/news')">
+          <button class="text-link" @click="goTo('/news')">
             Alla nyheter
             <ArrowRight :size="15" />
           </button>

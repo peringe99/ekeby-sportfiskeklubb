@@ -24,6 +24,11 @@ const router = createRouter({
       component: () => import('@/views/auth/AcceptInvitationView.vue'),
     },
     {
+      path: '/news',
+      name: 'PublicNews',
+      component: () => import('@/views/members/NewsView.vue'),
+    },
+    {
       path: '/members',
       component: () => import('@/layouts/MemberLayout.vue'),
       meta: { requiresAuth: true },
