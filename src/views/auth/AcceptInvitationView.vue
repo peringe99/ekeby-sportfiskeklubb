@@ -18,6 +18,7 @@ const submitting = ref(false)
 const invitationValid = ref(false)
 
 const email = ref('')
+const fullName = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 
@@ -68,6 +69,11 @@ async function createAccount() {
   errorMessage.value = ''
   successMessage.value = ''
 
+  if (!fullName.value.trim()) {
+    errorMessage.value = 'Ange ditt fullständiga namn.'
+    return
+  }
+
   if (password.value.length < 8) {
     errorMessage.value = 'Lösenordet måste innehålla minst 8 tecken.'
     return
@@ -83,6 +89,9 @@ async function createAccount() {
   try {
     const { error } = await supabase.auth.updateUser({
       password: password.value,
+      data: {
+        full_name: fullName.value.trim(),
+      },
     })
 
     if (error) {
@@ -90,9 +99,23 @@ async function createAccount() {
       return
     }
 
+    const { error: activationError } = await supabase.rpc('complete_member_invitation', {
+      p_full_name: fullName.value.trim(),
+    })
+
+    if (activationError) {
+      console.error('Could not activate invited member:', activationError)
+      errorMessage.value =
+        'Lösenordet sparades, men medlemskontot kunde inte aktiveras. Försök igen eller kontakta klubben.'
+      return
+    }
+
     successMessage.value = 'Ditt konto har skapats!'
 
     await router.replace('/members')
+  } catch (error) {
+    console.error('Could not complete member invitation:', error)
+    errorMessage.value = 'Det gick inte att slutföra kontot. Försök igen.'
   } finally {
     submitting.value = false
   }
@@ -135,6 +158,20 @@ async function createAccount() {
           </div>
 
           <div class="form-field">
+            <label for="full-name">Fullständigt namn</label>
+
+            <InputText
+              id="full-name"
+              v-model="fullName"
+              required
+              maxlength="120"
+              autocomplete="name"
+              placeholder="Ditt för- och efternamn"
+              class="w-full"
+            />
+          </div>
+
+          <div class="form-field">
             <label>Välj lösenord</label>
 
             <Password
@@ -172,7 +209,7 @@ async function createAccount() {
             type="submit"
             label="Skapa mitt konto"
             :loading="submitting"
-            :disabled="passwordMismatch || !password || !confirmPassword"
+            :disabled="!fullName.trim() || passwordMismatch || !password || !confirmPassword"
             class="submit-button"
           />
         </form>
