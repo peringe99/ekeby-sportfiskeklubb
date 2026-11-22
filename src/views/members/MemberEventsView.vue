@@ -325,11 +325,16 @@ onMounted(fetchEvents)
 
   .header-actions {
     width: 100%;
-    margin-left: 72px;
+    margin-left: 0;
+  }
+
+  .header-actions :deep(.create-event),
+  .header-actions :deep(.create-button) {
+    width: 100%;
   }
 
   .refresh-button {
-    margin-left: 72px;
+    margin-left: auto;
   }
 
   .event-card {
