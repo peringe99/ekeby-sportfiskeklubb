@@ -10,24 +10,40 @@ const auth = useAuthStore()
 const router = useRouter()
 const mobileMenuRef = ref(null)
 
-const accountButtonText = computed(() => (auth.user ? 'Min sida' : 'Logga in'))
-
 const mobileMenu = computed(() => [
   { label: 'Hem', command: () => router.push('/') },
   { label: 'Nyheter', url: '/#aktiviteter' },
   { label: 'Fångster', command: () => router.push('/fangster') },
   { label: 'Om klubben', command: () => router.push('/about') },
-  { label: accountButtonText.value, command: goToAccount },
-  { label: 'Logga ut', command: logout },
+  ...(auth.user ? [{ label: 'Min sida', command: goToAccount }] : []),
+  { label: auth.user ? 'Logga ut' : 'Logga in', command: handleAuthAction },
 ])
 
 function goToAccount() {
-  router.push(auth.user ? '/members' : '/login')
+  router.push('/members')
+}
+
+function goToLogin() {
+  router.push('/login')
+}
+
+async function handleAuthAction() {
+  if (auth.user) {
+    await logout()
+    return
+  }
+
+  goToLogin()
 }
 
 async function logout() {
-  await auth.logout()
-  router.push('/login')
+  const { error } = await auth.logout()
+  if (error) {
+    console.error('Failed to log out:', error)
+    return
+  }
+
+  await router.replace('/')
 }
 </script>
 
@@ -48,13 +64,14 @@ async function logout() {
         <RouterLink to="/fangster">Fångster</RouterLink>
         <RouterLink to="/about">Om klubben</RouterLink>
       </nav>
-      <button class="login-button" @click="goToAccount">
-        {{ accountButtonText }}
+      <button v-if="auth.user" class="login-button" @click="goToAccount">
+        Min sida
         <ArrowRight :size="16" />
       </button>
-      <button class="logout-button" @click="logout">
-        <LogOut :size="16" />
-        Logga ut
+      <button class="logout-button" @click="handleAuthAction">
+        <LogOut v-if="auth.user" :size="16" />
+        <ArrowRight v-else :size="16" />
+        {{ auth.user ? 'Logga ut' : 'Logga in' }}
       </button>
       <button
         class="mobile-menu-button"

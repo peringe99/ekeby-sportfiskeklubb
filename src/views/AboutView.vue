@@ -183,8 +183,8 @@ import { CalendarDays, MapPin, Users, Wallet, Fish, Home, ArrowRight, Clock } fr
         <Card class="price-card">
           <template #title>Inträdesavgift</template>
           <template #content>
-            <div class="price">500 kr</div>
-            <p>Engångsavgift för nya medlemmar</p>
+            <div class="price">0 kr</div>
+            <p>Ingen inträdesavgift</p>
           </template>
         </Card>
 

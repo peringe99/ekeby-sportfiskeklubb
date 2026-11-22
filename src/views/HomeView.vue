@@ -19,9 +19,7 @@ const auth = useAuthStore()
 
 const isLoggedIn = computed(() => !!auth.user)
 
-const accountButtonText = computed(() =>
-  isLoggedIn.value ? 'Min sida' : 'Logga in',
-)
+const accountButtonText = computed(() => (isLoggedIn.value ? 'Min sida' : 'Logga in'))
 
 function goToAccount() {
   router.push(isLoggedIn.value ? '/members' : '/login')
@@ -157,12 +155,20 @@ function goToAccount() {
           FÖR MEDLEMMAR
         </div>
 
-        <h2>Allt för klubbens medlemmar.</h2>
+        <h2>
+          {{ isLoggedIn ? 'Utforska klubbens innehåll.' : 'Allt för klubbens medlemmar.' }}
+        </h2>
 
-        <p>Logga in för att ta del av klubbnyheter, aktiviteter, dokument och information.</p>
+        <p>
+          {{
+            isLoggedIn
+              ? 'Utforska klubbens nyheter, fångster, aktiviteter och medlemsinformation.'
+              : 'Logga in för att ta del av klubbnyheter, aktiviteter, dokument och information.'
+          }}
+        </p>
 
-        <button class="primary-button" @click="goToLogin">
-          Logga in
+        <button class="primary-button" @click="goToAccount">
+          {{ isLoggedIn ? 'Utforska innehållet' : 'Logga in' }}
           <ArrowRight :size="17" />
         </button>
       </div>

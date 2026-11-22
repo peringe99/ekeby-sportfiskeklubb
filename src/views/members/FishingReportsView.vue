@@ -63,6 +63,7 @@ async function fetchReports() {
     const { data, error } = await supabase
       .from('fishing_reports')
       .select('fish_type, weight, location, description, image_path, full_name, created_at')
+      .order('created_at', { ascending: false })
 
     if (error) throw error
 

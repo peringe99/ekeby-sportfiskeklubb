@@ -24,11 +24,22 @@ interface Announcement {
   is_pinned: boolean
 }
 
+interface UpcomingEvent {
+  id: string
+  title: string
+  description: string
+  event_date: string
+  location: string
+}
+
 const auth = useAuthStore()
 const router = useRouter()
 
 const announcements = ref<Announcement[]>([])
+const upcomingEvents = ref<UpcomingEvent[]>([])
 const loadingNews = ref(true)
+const loadingEvents = ref(true)
+const eventError = ref('')
 
 const firstName = computed(() => {
   const name = auth.profile?.full_name?.trim()
@@ -60,6 +71,29 @@ async function fetchAnnouncements() {
   loadingNews.value = false
 }
 
+async function fetchUpcomingEvents() {
+  loadingEvents.value = true
+  eventError.value = ''
+
+  try {
+    const { data, error } = await supabase
+      .from('events')
+      .select('id, title, description, event_date, location')
+      .gte('event_date', new Date().toISOString())
+      .order('event_date', { ascending: true })
+      .limit(3)
+
+    if (error) throw error
+
+    upcomingEvents.value = data ?? []
+  } catch (error) {
+    console.error('Could not fetch upcoming events:', error)
+    eventError.value = 'Det gick inte att hämta aktiviteterna.'
+  } finally {
+    loadingEvents.value = false
+  }
+}
+
 function formatDate(date: string) {
   return new Intl.DateTimeFormat('sv-SE', {
     day: 'numeric',
@@ -67,11 +101,24 @@ function formatDate(date: string) {
   }).format(new Date(date))
 }
 
+function formatEventDate(date: string) {
+  return new Intl.DateTimeFormat('sv-SE', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(date))
+}
+
 function goTo(path: string) {
   router.push(path)
 }
 
-onMounted(fetchAnnouncements)
+onMounted(() => {
+  fetchAnnouncements()
+  fetchUpcomingEvents()
+})
 </script>
 
 <template>
@@ -203,7 +250,43 @@ onMounted(fetchAnnouncements)
             <CalendarDays :size="19" class="heading-icon" />
           </div>
 
-          <div class="placeholder-content">
+          <div v-if="loadingEvents" class="event-loading" aria-live="polite">
+            <i class="pi pi-spin pi-spinner"></i>
+            <span>Hämtar aktiviteter...</span>
+          </div>
+
+          <p v-else-if="eventError" class="event-error" role="alert">
+            {{ eventError }}
+          </p>
+
+          <div v-else-if="upcomingEvents.length" class="upcoming-events">
+            <article
+              v-for="(event, index) in upcomingEvents"
+              :key="event.id"
+              class="upcoming-event"
+            >
+              <div class="upcoming-event-topline">
+                <span class="upcoming-event-date">
+                  <CalendarDays :size="14" />
+                  {{ formatEventDate(event.event_date) }}
+                </span>
+                <span
+                  class="event-status-pill"
+                  :class="index === 0 ? 'event-status-next' : 'event-status-upcoming'"
+                >
+                  {{ index === 0 ? 'Nästa' : 'Kommande' }}
+                </span>
+              </div>
+              <strong>{{ event.title }}</strong>
+              <p>{{ event.description }}</p>
+              <span class="upcoming-event-location">
+                <MapPin :size="14" />
+                {{ event.location }}
+              </span>
+            </article>
+          </div>
+
+          <div v-else class="placeholder-content">
             <div class="placeholder-icon">
               <MapPin :size="23" />
             </div>
@@ -580,6 +663,97 @@ onMounted(fetchAnnouncements)
   line-height: 1.7;
   max-width: 230px;
   margin: 8px 0 0;
+}
+
+.event-loading,
+.event-error {
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  color: #87938a;
+  font-size: 12px;
+  text-align: center;
+}
+
+.event-error {
+  color: #b42318;
+}
+
+.upcoming-events {
+  display: flex;
+  flex-direction: column;
+}
+
+.upcoming-event {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 13px 0;
+  border-top: 1px solid #eff2ef;
+}
+
+.upcoming-event:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.upcoming-event:last-child {
+  padding-bottom: 20px;
+}
+
+.upcoming-event-date,
+.upcoming-event-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #6b8271;
+  font-size: 11px;
+}
+
+.upcoming-event-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.event-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.event-status-next {
+  color: #805713;
+  background: #fff3d6;
+}
+
+.event-status-upcoming {
+  color: #376b4c;
+  background: #eaf3ec;
+}
+
+.upcoming-event strong {
+  color: #405447;
+  font-size: 13px;
+}
+
+.upcoming-event p {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: #89948c;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 .full-width-link {

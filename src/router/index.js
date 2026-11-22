@@ -51,6 +51,16 @@ const router = createRouter({
           name: 'MemberNews',
           component: () => import('@/views/members/NewsView.vue'),
         },
+        {
+          path: 'directory',
+          name: 'MemberDirectory',
+          component: () => import('@/views/members/MemberDirectoryView.vue'),
+        },
+        {
+          path: 'events',
+          name: 'MemberEvents',
+          component: () => import('@/views/members/MemberEventsView.vue'),
+        },
       ],
     },
     {
@@ -66,7 +76,7 @@ router.beforeEach(async (to) => {
   await auth.initialize()
 
   if (to.meta.requiresAuth && !auth.user) {
-    return '/login'
+    return '/'
   }
 
   if (auth.user && !auth.profile) {

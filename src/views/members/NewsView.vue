@@ -7,6 +7,7 @@ import { supabase } from '@/utils/supabase'
 
 import PublicNavigation from '@/components/layout/PublicNavigation.vue'
 import CreateAnnouncement from '../members/CreateAnnouncement.vue'
+import AnnouncementActions from './AnnouncementActions.vue'
 
 import Card from 'primevue/card'
 import Button from 'primevue/button'
@@ -196,6 +197,12 @@ onMounted(async () => {
                 <p class="announcement-content">
                   {{ announcement.content }}
                 </p>
+
+                <AnnouncementActions
+                  v-if="isAdmin"
+                  :announcement="announcement"
+                  @changed="fetchAnnouncements"
+                />
               </article>
             </template>
           </Card>
