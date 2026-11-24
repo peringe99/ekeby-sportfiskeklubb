@@ -1,9 +1,29 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { ArrowRight, Fish, Waves, MapPin, Users, Newspaper, ChevronRight } from 'lucide-vue-next'
-import { computed } from 'vue'
+import {
+  ArrowRight,
+  CalendarDays,
+  ChevronRight,
+  Fish,
+  MapPin,
+  Newspaper,
+  Pin,
+  Users,
+  Waves,
+} from 'lucide-vue-next'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { supabase } from '@/utils/supabase'
 import PublicNavigation from '@/components/layout/PublicNavigation.vue'
+
+interface Announcement {
+  id: string | number
+  title: string
+  content: string
+  is_public: boolean
+  is_pinned: boolean
+  created_at: string
+}
 
 const router = useRouter()
 
@@ -18,12 +38,80 @@ function goToAbout() {
 const auth = useAuthStore()
 
 const isLoggedIn = computed(() => !!auth.user)
+const isActiveMember = computed(() => !!auth.user && auth.profile?.membership_status === 'active')
+const announcements = ref<Announcement[]>([])
+const loadingNews = ref(true)
+const newsError = ref('')
+let authReady = false
+let newsRequestId = 0
 
 const accountButtonText = computed(() => (isLoggedIn.value ? 'Min sida' : 'Logga in'))
 
 function goToAccount() {
   router.push(isLoggedIn.value ? '/members' : '/login')
 }
+
+function formatAnnouncementDate(date: string) {
+  return new Intl.DateTimeFormat('sv-SE', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  }).format(new Date(date))
+}
+
+async function fetchLatestNews() {
+  const requestId = ++newsRequestId
+  loadingNews.value = true
+  newsError.value = ''
+
+  try {
+    let query = supabase
+      .from('announcements')
+      .select('id, title, content, is_public, is_pinned, created_at')
+
+    if (!isActiveMember.value) {
+      query = query.eq('is_public', true)
+    }
+
+    const { data, error } = await query
+      .order('is_pinned', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(3)
+
+    if (error) throw error
+    if (requestId !== newsRequestId) return
+
+    announcements.value = data ?? []
+  } catch (error) {
+    if (requestId !== newsRequestId) return
+    console.error('Could not fetch home page news:', error)
+    newsError.value = 'Det gick inte att hämta nyheterna. Försök igen.'
+  } finally {
+    if (requestId === newsRequestId) {
+      loadingNews.value = false
+    }
+  }
+}
+
+watch(isActiveMember, (activeMember) => {
+  if (!authReady) return
+
+  if (!activeMember) {
+    announcements.value = announcements.value.filter((announcement) => announcement.is_public)
+  }
+
+  void fetchLatestNews()
+})
+
+onMounted(async () => {
+  await auth.initialize()
+  if (auth.user && !auth.profile) {
+    await auth.loadProfile()
+  }
+
+  authReady = true
+  await fetchLatestNews()
+})
 </script>
 
 <template>
@@ -105,6 +193,58 @@ function goToAccount() {
             <ChevronRight :size="17" />
           </button>
         </div>
+      </div>
+    </section>
+
+    <!-- Latest news -->
+    <section class="home-news" aria-labelledby="latest-news-title">
+      <div class="home-news-heading">
+        <div>
+          <div class="intro-label">
+            <span></span>
+            FRÅN KLUBBEN
+          </div>
+          <h2 id="latest-news-title">Senaste nytt</h2>
+        </div>
+        <RouterLink to="/news" class="home-news-link">
+          Alla nyheter
+          <ArrowRight :size="16" />
+        </RouterLink>
+      </div>
+
+      <div v-if="loadingNews" class="home-news-state" aria-live="polite">Hämtar nyheter...</div>
+
+      <div v-else-if="newsError" class="home-news-state home-news-error" role="alert">
+        <p>{{ newsError }}</p>
+        <button type="button" class="home-news-retry" @click="fetchLatestNews">Försök igen</button>
+      </div>
+
+      <p v-else-if="announcements.length === 0" class="home-news-state">
+        Inga nyheter att visa just nu.
+      </p>
+
+      <div v-else class="home-news-grid">
+        <article
+          v-for="announcement in announcements"
+          :key="announcement.id"
+          class="home-news-card"
+        >
+          <div class="home-news-meta">
+            <span v-if="announcement.is_pinned" class="home-news-badge important">
+              <Pin :size="13" />
+              Viktigt
+            </span>
+            <span v-if="!announcement.is_public" class="home-news-badge members-only">
+              Endast medlemmar
+            </span>
+            <time :datetime="announcement.created_at">
+              <CalendarDays :size="14" />
+              {{ formatAnnouncementDate(announcement.created_at) }}
+            </time>
+          </div>
+          <h3>{{ announcement.title }}</h3>
+          <p>{{ announcement.content }}</p>
+        </article>
       </div>
     </section>
 
@@ -470,6 +610,149 @@ function goToAccount() {
   margin: 0;
 }
 
+.home-news {
+  max-width: 1170px;
+  margin: 0 auto;
+  padding: 85px 35px 100px;
+}
+
+.home-news-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.home-news-heading h2 {
+  margin: 18px 0 0;
+  color: #294533;
+  font-size: 34px;
+  letter-spacing: -1px;
+}
+
+.home-news-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding-bottom: 4px;
+  color: #477453;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.home-news-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.home-news-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 32px;
+}
+
+.home-news-card {
+  min-width: 0;
+  padding: 22px;
+  background: #fff;
+  border: 1px solid #e8ede8;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgb(30 55 38 / 4%);
+}
+
+.home-news-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.home-news-meta time {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  color: #89938c;
+  font-size: 0.75rem;
+}
+
+.home-news-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 7px;
+  border-radius: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.home-news-badge.important {
+  color: #805713;
+  background: #fff3d6;
+}
+
+.home-news-badge.members-only {
+  color: #596a87;
+  background: #edf0f7;
+}
+
+.home-news-card h3 {
+  margin: 0 0 9px;
+  color: #294533;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.home-news-card > p {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: #78857b;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
+.home-news-state {
+  margin: 30px 0 0;
+  padding: 24px;
+  color: #718078;
+  background: #fff;
+  border: 1px solid #e8ede8;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.home-news-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #b42318;
+}
+
+.home-news-error p {
+  margin: 0;
+}
+
+.home-news-retry {
+  padding: 7px 10px;
+  border: 1px solid #e4e9e4;
+  border-radius: 7px;
+  color: #536c5c;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
 /* Member CTA */
 .member-cta {
   position: relative;
@@ -583,6 +866,23 @@ function goToAccount() {
 
   .values-grid {
     grid-template-columns: 1fr;
+  }
+
+  .home-news {
+    padding: 70px 25px;
+  }
+
+  .home-news-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .home-news-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-news-card {
+    padding: 20px;
   }
 
   .member-cta {

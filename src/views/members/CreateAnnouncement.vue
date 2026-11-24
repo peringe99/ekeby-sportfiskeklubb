@@ -88,9 +88,21 @@ async function publishAnnouncement() {
     <Dialog
       v-model:visible="visible"
       modal
+      dismissableMask
       header="Skapa en nyhet"
-      :style="{ width: 'min(600px, 95vw)' }"
+      :style="{
+        width: 'min(600px, 95vw)',
+        backgroundColor: '#fff',
+        color: '#25332b',
+        borderRadius: '14px',
+        overflow: 'hidden',
+      }"
       :draggable="false"
+      :pt="{
+        header: { style: { backgroundColor: '#fff', color: '#25332b' } },
+        content: { style: { backgroundColor: '#fff', color: '#25332b' } },
+        footer: { style: { backgroundColor: '#fff', color: '#25332b' } },
+      }"
     >
       <div class="announcement-form">
         <div class="form-intro">
@@ -212,6 +224,7 @@ async function publishAnnouncement() {
   flex-direction: column;
   gap: 24px;
   padding-top: 10px;
+  color: #25332b;
 }
 
 .form-intro {
@@ -258,12 +271,24 @@ async function publishAnnouncement() {
   width: 100%;
 }
 
+.announcement-form :deep(.p-inputtext),
+.announcement-form :deep(.p-textarea) {
+  background-color: #fff;
+  color: #25332b;
+}
+
+.announcement-form :deep(.p-inputtext::placeholder),
+.announcement-form :deep(.p-textarea::placeholder) {
+  color: #849087;
+}
+
 .options {
   display: flex;
   flex-direction: column;
   gap: 17px;
   padding: 18px;
-  background: #f8faf8;
+  background: #fff;
+  border: 1px solid #e8ede8;
   border-radius: 10px;
   color: black;
 }

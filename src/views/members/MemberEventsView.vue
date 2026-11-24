@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { CalendarDays, MapPin, RefreshCw } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { supabase } from '@/utils/supabase'
-import CreateEvent from './CreateEvent.vue'
+import ManageEvent from './ManageEvent.vue'
 import EventComments from './EventComments.vue'
 
 interface ClubEvent {
@@ -91,7 +91,7 @@ onMounted(fetchEvents)
         <p>Se klubbens aktiviteter och kommande evenemang.</p>
       </div>
       <div v-if="isAdmin" class="header-actions">
-        <CreateEvent @created="fetchEvents" />
+        <ManageEvent @created="fetchEvents" />
       </div>
       <button class="refresh-button" type="button" :disabled="loading" @click="fetchEvents">
         <RefreshCw :size="16" />
@@ -132,6 +132,7 @@ onMounted(fetchEvents)
           <MapPin :size="16" />
           {{ event.location }}
         </div>
+        <ManageEvent v-if="isAdmin" :event="event" @changed="fetchEvents" />
         <EventComments :event-id="event.id" />
       </article>
     </section>
